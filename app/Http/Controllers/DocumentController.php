@@ -80,9 +80,12 @@ class DocumentController extends Controller
     }
 
 
-    public function show()
+    public function show($id)
     {
-        return Inertia::render('Company/Pages/Documents/DocumentPreview');
+
+        return Inertia::render('Document/DocumentPreview', [
+            'documentId'=>$id,
+        ]);
     }
 
 

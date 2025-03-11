@@ -1,6 +1,6 @@
 <template>
     <div>
-        <!-- <ShareDrawer :visible="documentDrawerVisible" :id="documentId" /> -->
+        <ShareDrawer :visible="documentDrawerVisible" :id="documentId" />
 
 
         <div class="card p-2">
@@ -87,8 +87,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 // import { FilterMatchMode } from 'primevue/api';
-
-// import ShareDrawer from './Documents/ShareDrawer.vue';
+import ShareDrawer from './ShareDrawer.vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
@@ -185,7 +184,7 @@ const uploadDocument = async (event) => {
 }
 
 const viewDocument = (id) => {
-    // router.push(`/document/${id}/preview`);
+    window.location.href = `/document/${id}/preview`;
 }
 
 const shareDocument = (id) =>{

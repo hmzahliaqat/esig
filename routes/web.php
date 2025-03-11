@@ -17,7 +17,7 @@ Route::get('/', function () {
 
 
 Route::post('save/document', [DocumentController::class , 'upload']);
-Route::post('document/{id}/preview', [DocumentController::class , 'show']);
+Route::get('document/{id}/preview', [DocumentController::class , 'show']);
 
 
 Route::post('/replace-pdf', [DocumentController::class , 'replacePdf']);
