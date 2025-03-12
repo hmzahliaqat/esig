@@ -215,7 +215,14 @@ class DocumentController extends Controller
         return $pdfPath;
     }
 
+//
 
+
+public function track(){
+
+    return Inertia::render('Document/TrackDocument');
+
+}
 
 
 }

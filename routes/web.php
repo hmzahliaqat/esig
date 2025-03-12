@@ -51,6 +51,7 @@ Route::middleware([
 
     Route::get('/employees' , [EmployeesController::class, 'index'])->name('employees');
     Route::get('/documents' , [DocumentController::class, 'index'])->name('documents');
+    Route::get('/track/documents' , [DocumentController::class, 'track'])->name('track.documents');
 
 
 });
