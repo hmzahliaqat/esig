@@ -6,8 +6,14 @@ use App\Models\Document;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
+use App\Mail\ShareDocumentMail;
+use App\Models\sharedDocuments;
+use App\Models\SignedDocuments;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use setasign\Fpdi\Tcpdf\Fpdi;
+use Illuminate\Support\Str;
+
 class DocumentController extends Controller
 {
 
@@ -80,12 +86,34 @@ class DocumentController extends Controller
     }
 
 
-    public function show($id)
+    public function show($id, $emloyee_id=null)
     {
+        $document =  Document::find($id);
 
         return Inertia::render('Document/DocumentPreview', [
-            'documentId'=>$id,
+            'document'=>$document,
+            'employee_id'=>$emloyee_id
         ]);
+    }
+
+
+    public function share(Request $request){
+
+        $employee = $request->employee;
+
+
+      $sharedDocument =  sharedDocuments::create([
+            'document_id'=>$request->id,
+            'access_hash'=>hash('sha256', Str::random(40) . time() . config('app.key')),
+            'status'=> 0,
+        ]);
+
+
+
+        Mail::to($employee['email'])->send(new ShareDocumentMail($request->id , $employee['id']));
+
+        return response()->json('email sent' , 200);
+
     }
 
 
@@ -115,6 +143,32 @@ class DocumentController extends Controller
         $newFile->move($documentsPath, $fileName);
 
         return response()->json(['message' => 'File replaced successfully.']);
+
+    }
+
+
+    public function saveSharedPdf(Request $request){
+        $request->validate([
+            'file' => 'required|file|mimes:pdf',
+            'filepath' => 'required|string'
+        ]);
+        $file = $request->file('file');
+
+        $document = Document::find($request->document_id);
+
+        $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+        $storagePath = 'documents/signed';
+        $path = $file->storeAs($storagePath, $fileName, 'public');
+        $pdfPath = $path;
+
+        SignedDocuments::create([
+            'user_id'=>$document->user_id,
+            'employee_id'=>$request->employee_id,
+            'shared_document_id'=>1,
+            'file_path'=>$path,
+            'pdf_path'=>$pdfPath,
+        ]);
+
 
     }
 

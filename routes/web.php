@@ -17,11 +17,13 @@ Route::get('/', function () {
 
 
 Route::post('save/document', [DocumentController::class , 'upload']);
-Route::get('document/{id}/preview', [DocumentController::class , 'show']);
+Route::get('document/{id}/{shared}/preview', [DocumentController::class , 'show']);
 
 
 Route::post('/replace-pdf', [DocumentController::class , 'replacePdf']);
+Route::post('/save-shared-pdf', [DocumentController::class , 'saveSharedPdf']);
 
+Route::post('/share/document', [DocumentController::class , 'share']);
 
 
 

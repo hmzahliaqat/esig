@@ -59,7 +59,14 @@ const employees = employeeStore.employee;
 // Function to share the document with a specific user
 const shareUser = (user) => {
   console.log(`Sharing document with ${user.name}`);
-  // Insert your share logic here
+
+ axios.post("/share/document", {
+    id: props.id,
+    employee: user,
+    _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+  })
+  .then((res) => console.log(res))
+  .catch((error) => console.error("Error sharing document:", error));
 };
 
 // Function to share the document with all users

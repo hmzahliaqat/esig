@@ -85,6 +85,7 @@
 </template>
 
 <script setup>
+import axios from 'axios';
 import { ref, onMounted } from 'vue';
 // import { FilterMatchMode } from 'primevue/api';
 import ShareDrawer from './ShareDrawer.vue';
@@ -170,7 +171,7 @@ const uploadDocument = async (event) => {
             position: 'top-right',
         });
         // Redirect to document editor
-        window.location.href = `/document/${response.data.id}/preview`;
+        // window.location.href = `/document/${response.data.id}/preview`;
     } catch (error) {
         console.error('Upload failed:', error);
         errorMessage.value = error.response?.data?.message || 'Upload failed. Please try again.';
@@ -184,7 +185,7 @@ const uploadDocument = async (event) => {
 }
 
 const viewDocument = (id) => {
-    window.location.href = `/document/${id}/preview`;
+    window.location.href = `/document/${id}/false/preview`;
 }
 
 const shareDocument = (id) =>{
