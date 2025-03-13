@@ -33,6 +33,7 @@ import { ref, watch } from "vue";
 import Drawer from "primevue/drawer";
 import Button from "primevue/button";
 import { useEmployeeStore } from "@/Store/EmployeeStore";
+import { useDocumentStore } from "@/Store/DocumentStore";
 const props = defineProps({
   visible: {
     type: Boolean,
@@ -44,6 +45,7 @@ const props = defineProps({
   },
 });
 const employeeStore = useEmployeeStore();
+const documentStore = useDocumentStore();
 const visibleRight = ref(props.visible);
 
 // Watch for changes in the visible prop to update the drawer visibility
@@ -59,10 +61,11 @@ const employees = employeeStore.employee;
 // Function to share the document with a specific user
 const shareUser = (user) => {
   console.log(`Sharing document with ${user.name}`);
-
+  const documet = documentStore.document.find(doc=> doc.id == props.id);
  axios.post("/share/document", {
     id: props.id,
     employee: user,
+    access_hash:documet?.access_hash,
     _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
   })
   .then((res) => console.log(res))

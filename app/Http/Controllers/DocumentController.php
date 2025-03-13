@@ -6,223 +6,121 @@ use App\Models\Document;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
-use App\Mail\ShareDocumentMail;
+use App\Http\Requests\ReplacePdfRequest;
+use App\Http\Requests\ShareDocumentRequest;
+use App\Http\Requests\UploadDocumentRequest;
 use App\Models\sharedDocuments;
-use App\Models\SignedDocuments;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
-use setasign\Fpdi\Tcpdf\Fpdi;
-use Illuminate\Support\Str;
+use App\Services\DocumentService;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class DocumentController extends Controller
 {
+    protected $documentService;
+
+    public function __construct(DocumentService $documentService)
+    {
+        $this->documentService = $documentService;
+    }
+
 
     public function index()
     {
+        $documents = Document::where('user_id', Auth::id())->get();
 
-        $documents = Document::where('user_id', 1)->get();
-
-        return  Inertia::render('Document/Document' , [
+        return Inertia::render('Document/Document', [
             'documents' => $documents,
         ]);
     }
 
 
-
-    public function upload(Request $request)
+    public function upload(UploadDocumentRequest $request)
     {
+        try {
+            $document = $this->documentService->store(
+                $request->file('file'),
+                $request->title,
+                Auth::id()
+            );
 
-        $request->validate([
-            'file' => 'required|mimes:pdf,doc,docx,txt|max:1000',
-            'title' => 'nullable|string'
-        ]);
-
-        $file = $request->file('file');
-
-
-        $originalName = $file->getClientOriginalName();
-        $extension = $file->getClientOriginalExtension();
-        $path = $file->store('documents' , 'public');
-
-
-
-        $title = $request->title ?? pathinfo($originalName, PATHINFO_FILENAME);
-
-        // Handle different file types
-        $pageCount = 1;
-        $pdfPath = $path;
-
-        if ($extension === 'pdf') {
-            // Get PDF page count
-            $pdf = new Fpdi();
-            $pageCount = $pdf->setSourceFile(storage_path('app/public/' . $path));
-        } else if (in_array($extension, ['doc', 'docx'])) {
-
-            // Convert Word to PDF
-            $pdfPath = $this->convertWordToPdf($path);
-
-            // Get page count of the converted PDF
-            $pdf = new Fpdi();
-            $pageCount = $pdf->setSourceFile(storage_path('app/private/' . $pdfPath));
-        } else if ($extension === 'txt') {
-            // Convert text file to PDF
-            $pdfPath = $this->convertTextToPdf($path);
-
-            // Get page count
-            $pdf = new Fpdi();
-            $pageCount = $pdf->setSourceFile(storage_path('app/private/' . $pdfPath));
+            return response()->json($document, 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        $document = Document::create([
-            'title' => $title,
-            'file_path' => $path,
-            'pdf_path' => $pdfPath,
-            'page_count' => $pageCount,
-            'file_type' => $extension,
-            'user_id' => 1
-        ]);
-
-        return response()->json($document, 201);
     }
 
 
-    public function show($id, $emloyee_id=null)
+    public function show($id, $employeeId = null)
     {
-        $document =  Document::find($id);
+        $document = Document::findOrFail($id);
+
 
         return Inertia::render('Document/DocumentPreview', [
-            'document'=>$document,
-            'employee_id'=>$emloyee_id
+            'document' => $document,
+            'employee_id' => $employeeId
         ]);
     }
 
 
-    public function share(Request $request){
-
-        $employee = $request->employee;
-
-
-      $sharedDocument =  sharedDocuments::create([
-            'document_id'=>$request->id,
-            'access_hash'=>hash('sha256', Str::random(40) . time() . config('app.key')),
-            'status'=> 0,
-        ]);
-
-
-
-        Mail::to($employee['email'])->send(new ShareDocumentMail($request->id , $employee['id']));
-
-        return response()->json('email sent' , 200);
-
-    }
-
-
-
-    public function replacePdf(Request $request)
+    public function share(ShareDocumentRequest $request)
     {
-        $request->validate([
-            'file' => 'required|file|mimes:pdf',
-            'filepath' => 'required|string'
-        ]);
+        try {
+            $document = Document::findOrFail($request->id);
 
-        $newFile = $request->file('file');
-        $fileName = basename($request->input('filepath')); // extract the file name from the path
+            $existingShare = SharedDocuments::where([
+                'document_id' => $request->id,
+                'employee_id' => $request->employee['id']
+            ])->first();
 
-        // Define the storage directory path
-        $documentsPath = public_path('storage/documents');
-        $existingFilePath = $documentsPath . DIRECTORY_SEPARATOR . $fileName;
+            if ($existingShare && $existingShare->isExpired()) {
+                $existingShare->delete();
+            }
 
-        // Check if the file exists
-        if (file_exists($existingFilePath)) {
-            // Remove the old file
-            unlink($existingFilePath);
-        } else {
-            return response()->json(['error' => 'File not found.'], 404);
+
+            $alreadyShared = sharedDocuments::where(['document_id'=>$request->id, 'employee_id'=>$request->employee['id']])
+            ->first();
+
+
+            if($alreadyShared){
+                return response()->json('Document Already Shared');
+            }
+
+            $this->documentService->shareWithEmployee($request->id, $request->employee);
+
+            return response()->json(['message' => 'Email sent successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        $newFile->move($documentsPath, $fileName);
-
-        return response()->json(['message' => 'File replaced successfully.']);
-
     }
 
 
-    public function saveSharedPdf(Request $request){
-        $request->validate([
-            'file' => 'required|file|mimes:pdf',
-            'filepath' => 'required|string'
-        ]);
-        $file = $request->file('file');
-
-        $document = Document::find($request->document_id);
-
-        $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-        $storagePath = 'documents/signed';
-        $path = $file->storeAs($storagePath, $fileName, 'public');
-        $pdfPath = $path;
-
-        SignedDocuments::create([
-            'user_id'=>$document->user_id,
-            'employee_id'=>$request->employee_id,
-            'shared_document_id'=>1,
-            'file_path'=>$path,
-            'pdf_path'=>$pdfPath,
-        ]);
-
-
-    }
-
-
-    private function convertWordToPdf($wordPath)
+    public function replacePdf(ReplacePdfRequest $request)
     {
-        // You would need to install phpoffice/phpword
-        // composer require phpoffice/phpword
-
-        $phpWord = \PhpOffice\PhpWord\IOFactory::load(storage_path('app/' . $wordPath));
-        $pdfWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'PDF');
-
-        $pdfPath = 'documents/' . basename($wordPath, '.' . pathinfo($wordPath, PATHINFO_EXTENSION)) . '.pdf';
-        $pdfWriter->save(storage_path('app/' . $pdfPath));
-
-        return $pdfPath;
+        try {
+            $this->documentService->replacePdf($request->file('file'), $request->input('filepath'));
+            return response()->json(['message' => 'File replaced successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 500);
+        }
     }
 
-    private function convertTextToPdf($textPath)
+    public function saveSharedPdf(Request $request)
     {
-        // Using TCPDF to convert text file to PDF
-        // composer require tecnickcom/tcpdf
+        try {
+            $signedDocument = $this->documentService->saveSignedDocument(
+                $request->file('file'),
+                $request->document_id,
+                $request->employee_id,            );
 
-        $pdf = new \TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetTitle(basename($textPath));
-        $pdf->SetHeaderData('', 0, basename($textPath), '');
-        $pdf->setHeaderFont([PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN]);
-        $pdf->setFooterFont([PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA]);
-        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-
-        $pdf->AddPage();
-
-        $textContent = file_get_contents(storage_path('app/' . $textPath));
-        $pdf->writeHTML(nl2br(htmlspecialchars($textContent)), true, false, true, false, '');
-
-        $pdfPath = 'documents/' . basename($textPath, '.txt') . '.pdf';
-        $pdf->Output(storage_path('app/' . $pdfPath), 'F');
-
-        return $pdfPath;
+            return response()->json(['message' => 'Document saved successfully', 'document' => $signedDocument]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
-//
 
-
-public function track(){
-
-    return Inertia::render('Document/TrackDocument');
-
-}
-
-
+    public function track()
+    {
+        return Inertia::render('Document/TrackDocument');
+    }
 }

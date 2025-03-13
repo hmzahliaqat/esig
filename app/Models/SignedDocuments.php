@@ -15,4 +15,31 @@ class SignedDocuments extends Model
         'page_count',
         'file_type'
     ];
+
+     /**
+     * Get the user who owns this document
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the shared document this signed document belongs to
+     */
+    public function sharedDocument()
+    {
+        return $this->belongsTo(sharedDocuments::class);
+    }
+
+    /**
+     * Get the file URL
+     */
+    public function getFileUrlAttribute(): string
+    {
+        return asset('storage/' . $this->file_path);
+    }
+
+
+
 }
