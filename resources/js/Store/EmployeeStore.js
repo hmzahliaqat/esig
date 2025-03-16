@@ -12,9 +12,15 @@ export const useEmployeeStore = defineStore('employee', () => {
         employee.value.push(data);
     };
 
+    const importEmployees = (newEmployees) => {
+        newEmployees.forEach(emp => employee.value.push(emp));
+    };
+
     watch(employee, (newVal) => {
+        console.log("Updated Employees:", newVal); // Debugging log
+
         localStorage.setItem('employee', JSON.stringify(newVal));
     }, { deep: true });
 
-    return { employee, setEmployee, addEmployee };
+    return { employee, setEmployee, addEmployee, importEmployees };
 });
