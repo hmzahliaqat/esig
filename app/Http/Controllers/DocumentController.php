@@ -76,12 +76,10 @@ class DocumentController extends Controller
                 $existingShare->delete();
             }
 
+            $alreadyShared = sharedDocuments::where(['document_id' => $request->id, 'employee_id' => $request->employee['id']])
+                ->first();
 
-            $alreadyShared = sharedDocuments::where(['document_id'=>$request->id, 'employee_id'=>$request->employee['id']])
-            ->first();
-
-
-            if($alreadyShared){
+            if ($alreadyShared) {
                 return response()->json('Document Already Shared');
             }
 
@@ -110,7 +108,8 @@ class DocumentController extends Controller
             $signedDocument = $this->documentService->saveSignedDocument(
                 $request->file('file'),
                 $request->document_id,
-                $request->employee_id,            );
+                $request->employee_id,
+            );
 
             return response()->json(['message' => 'Document saved successfully', 'document' => $signedDocument]);
         } catch (\Exception $e) {
@@ -122,5 +121,17 @@ class DocumentController extends Controller
     public function track()
     {
         return Inertia::render('Document/TrackDocument');
+    }
+
+
+    public function delete(Request $request)
+    {
+        if ($request->has('ids')) {
+            Document::whereIn('id', $request->ids)->delete();
+            return response()->json('Documents deleted', 200);
+        }
+
+        $document =  Document::find($request->id);
+        return response()->json('Document deleted', 200);
     }
 }

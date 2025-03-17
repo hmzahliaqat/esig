@@ -66,7 +66,7 @@
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteDocumentDialog = false" />
-                <Button label="Yes" icon="pi pi-check" @click="deleteDocument" />
+                <Button label="Yes" icon="pi pi-check" @click="deleteDocument(document.id)" />
             </template>
         </Dialog>
 
@@ -227,11 +227,26 @@ const confirmDeleteDocument = (doc) => {
     deleteDocumentDialog.value = true;
 };
 
-const deleteDocument = () => {
+const deleteDocument = (id) => {
+    axios
+        .delete(`/delete/document`,{
+            data:id,
+        })
+        .then((res) => {
+            $toast.info("Employee deleted!", {
+                position: "top-right",
+            });
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+
+
     documents.value = documents.value.filter(val => val.id !== document.value.id);
     deleteDocumentDialog.value = false;
     document.value = {};
 };
+
 
 const findIndexById = (id) => {
     let index = -1;
@@ -250,10 +265,42 @@ const confirmDeleteSelected = () => {
     deleteDocumentsDialog.value = true;
 };
 
-const deleteSelectedDocuments = () => {
-    documents.value = documents.value.filter(val => !selectedDocuments.value.includes(val));
-    deleteDocumentsDialog.value = false;
-    selectedDocuments.value = null;
+const deleteSelectedDocuments = async() => {
+
+    if (selectedDocuments.value && selectedDocuments.value.length) {
+        const documents_ids = selectedDocuments.value.map((doc) => doc.id);
+        console.log("Selected Documets IDs:", documents_ids);
+
+        try {
+            await axios.delete("/delete/document", {
+                data: { ids: documents_ids },
+            });
+
+            // Remove deleted documents from the local state
+            documents.value = documents.value.filter(
+                (doc) => !documents_ids.includes(doc.id)
+            );
+
+            // Reset selected documents
+            selectedDocuments.value = null;
+            deleteDocumentsDialog.value = false;
+            $toast.info("documents deleted!", {
+                position: 'top-right'
+            });
+        } catch (error) {
+            console.error("Error deleting documents:", error);
+        }
+
+        documents.value = documents.value.filter(
+            (val) => !selectedDocuments.value.includes(val)
+        );
+        deleteDocumentsDialog.value = false;
+        selectedDocuments.value = null;
+    } else {
+        $toast.error("Something Went Wrong!", {
+            position: "top-right",
+        });
+    }
 };
 
 onMounted(() => {

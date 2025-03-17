@@ -27,13 +27,25 @@ class EmployeesController extends Controller
     public function save(EmployeeRequest $request)
     {
 
-        $employee = Employee::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'user_id' => Auth::id(),
-        ]);
+        if($request->has('id')){
+         $employee = Employee::find($request->id);
 
-        return response()->json($employee, 200);
+         if($employee){
+            $employee->name = $request->name;
+            $employee->email = $request->email;
+            $employee->save();
+         }
+         return response()->json($employee, 200);
+
+        }else{
+            $employee = Employee::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'user_id' => Auth::id(),
+            ]);
+            return response()->json($employee, 200);
+        }
+
 
 
     }
