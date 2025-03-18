@@ -293,7 +293,9 @@ const savePdf = async () => {
 
         // Use Laravel's CSRF token
         formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-        if (!props.employee_id) {
+        console.log(props.employee_id);
+
+        if (props.employee_id) {
             // Send to a Laravel route
             const response = await fetch('/replace-pdf', {
                 method: 'POST',
@@ -320,6 +322,8 @@ const savePdf = async () => {
                 }
 
             });
+            // window.location.href='/thank-you';
+
             if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Failed to save the file');

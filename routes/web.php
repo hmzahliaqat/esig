@@ -15,6 +15,9 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/thank-you', function(){
+    return view('thankyou');
+});
 
 
 Route::post('save/employee', [EmployeesController::class , 'save']);
