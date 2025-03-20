@@ -295,7 +295,7 @@ const savePdf = async () => {
         formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
         console.log(props.employee_id);
 
-        if (props.employee_id) {
+        if (props.employee_id == 0) {
             // Send to a Laravel route
             const response = await fetch('/replace-pdf', {
                 method: 'POST',

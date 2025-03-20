@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Document;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
@@ -120,6 +121,18 @@ class DocumentController extends Controller
 
     public function track()
     {
+
+        $users = User::with(['sharedDocuments' => function ($query) {
+            // Group shared documents by employee_id
+            $query->with('employee')->orderBy('employee_id');
+        }])->get();
+
+        $groupedDocuments = $users->flatMap(function ($user) {
+            return $user->sharedDocuments->groupBy('employee_id');
+        });
+dd($users);
+
+
         return Inertia::render('Document/TrackDocument');
     }
 

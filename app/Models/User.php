@@ -72,7 +72,10 @@ class User extends Authenticatable
 
 
 
-
+    public function sharedDocuments()
+    {
+        return $this->hasMany(sharedDocuments   ::class);
+    }
 
 
 

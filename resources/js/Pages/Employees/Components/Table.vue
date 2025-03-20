@@ -238,9 +238,9 @@ const confirmDeleteEmployee = (emp) => {
 };
 
 const deleteEmployee = (id) => {
-    employees.value = employees.value.filter(
-        (val) => val.id !== employee.value.id
-    );
+    // Remove employee from the store
+    employeeStore.employee = employeeStore.employee.filter(emp => emp.id !== id);
+
     deleteEmployeeDialog.value = false;
     employee.value = {};
 

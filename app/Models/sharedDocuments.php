@@ -22,9 +22,22 @@ class sharedDocuments extends Model
     ];
 
 
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Define the relationship with Document
     public function document()
     {
         return $this->belongsTo(Document::class);
+    }
+
+    // Define the relationship with Employee
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
     }
 
 

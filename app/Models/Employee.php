@@ -16,4 +16,8 @@ class Employee extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function sharedDocuments()
+    {
+        return $this->hasMany(SharedDocument::class);
+    }
 }

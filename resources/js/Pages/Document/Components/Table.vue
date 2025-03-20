@@ -185,7 +185,7 @@ const uploadDocument = async (event) => {
 }
 
 const viewDocument = (id) => {
-    window.location.href = `/document/${id}/false/preview`;
+    window.location.href = `/document/${id}/0/preview`;
 }
 
 const shareDocument = (id) =>{
@@ -233,7 +233,7 @@ const deleteDocument = (id) => {
             data:id,
         })
         .then((res) => {
-            $toast.info("Employee deleted!", {
+            $toast.info("Document deleted!", {
                 position: "top-right",
             });
         })
