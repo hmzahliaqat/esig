@@ -1,10 +1,13 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { useDocumentStore } from '@/Store/DocumentStore';
+import { useTrackDocumentStore } from '@/Store/TrackDocumentStore';
 import TrackDocumentComponent from './Components/TrackDocumentComponent.vue';
-const props = defineProps(['documents']);
-const documentStore = useDocumentStore();
-documentStore.setDocument(props.documents);
+const props = defineProps(['users', 'totalDocuments', 'totalSignedDocuments', 'totalPendingDocuments']);
+const trackDocumentStore = useTrackDocumentStore();
+trackDocumentStore.setTrackDocument(props.users);
+trackDocumentStore.setSharedDocuments(props.totalDocuments);
+trackDocumentStore.setSignedDocuments(props.totalSignedDocuments);
+trackDocumentStore.setPendingDocuments(props.totalPendingDocuments);
 </script>
 
 <template>

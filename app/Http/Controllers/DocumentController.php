@@ -122,18 +122,18 @@ class DocumentController extends Controller
     public function track()
     {
 
-        $users = User::with(['sharedDocuments' => function ($query) {
-            // Group shared documents by employee_id
-            $query->with('employee')->orderBy('employee_id');
-        }])->get();
+        $users = sharedDocuments::with('user', 'document')->get();
 
-        $groupedDocuments = $users->flatMap(function ($user) {
-            return $user->sharedDocuments->groupBy('employee_id');
-        });
-dd($users);
+        $totalSharedDocumentCount = sharedDocuments::get()->count();
+        $totalSignedDocumentCount = sharedDocuments::where('status', 1)->get()->count();
+        $totalPendingDocumentCount = sharedDocuments::where('status', 0)->get()->count();
 
-
-        return Inertia::render('Document/TrackDocument');
+        return Inertia::render('Document/TrackDocument' , [
+            'users' => $users,
+            'totalDocuments' => $totalSharedDocumentCount,
+            'totalSignedDocuments' => $totalSignedDocumentCount,
+            'totalPendingDocuments' => $totalPendingDocumentCount,
+        ]);
     }
 
 

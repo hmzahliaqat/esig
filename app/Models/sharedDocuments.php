@@ -57,6 +57,14 @@ class sharedDocuments extends Model
         return route('documents.shared', ['hash' => $this->access_hash]);
     }
 
+    public function getSignedAtAttribute($value){
+        return $value ? Carbon::parse($value)->diffForHumans() : 'N/A';
+    }
+
+    public function getStatusAttribute($value){
+        return $value == 1 ? 'Signed' : 'Pending';
+    }
+
     public function isExpired()
     {
         return Carbon::parse($this->created_at)
