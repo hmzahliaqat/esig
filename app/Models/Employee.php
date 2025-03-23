@@ -18,6 +18,6 @@ class Employee extends Model
     }
     public function sharedDocuments()
     {
-        return $this->hasMany(SharedDocument::class);
+        return $this->hasMany(sharedDocuments::class);
     }
 }

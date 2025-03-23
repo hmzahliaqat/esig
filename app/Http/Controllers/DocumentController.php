@@ -122,7 +122,7 @@ class DocumentController extends Controller
     public function track()
     {
 
-        $users = sharedDocuments::with('user', 'document')->get();
+        $users = sharedDocuments::with('user', 'document', 'employee')->get();
 
         $totalSharedDocumentCount = sharedDocuments::get()->count();
         $totalSignedDocumentCount = sharedDocuments::where('status', 1)->get()->count();

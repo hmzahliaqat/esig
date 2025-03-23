@@ -65,6 +65,8 @@ class sharedDocuments extends Model
         return $value == 1 ? 'Signed' : 'Pending';
     }
 
+
+
     public function isExpired()
     {
         return Carbon::parse($this->created_at)

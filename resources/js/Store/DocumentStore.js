@@ -2,8 +2,17 @@ import { defineStore } from 'pinia';
 import { ref , watch } from 'vue';
 
 export const useDocumentStore = defineStore('document', () => {
-    const document = ref(JSON.parse(localStorage.getItem('document')) || []);
+    const storedData = localStorage.getItem('document');
 
+    let parsedData;
+    try {
+      parsedData = storedData ? JSON.parse(storedData) : [];
+    } catch (error) {
+      console.error("Error parsing JSON from localStorage:", error);
+      parsedData = []; // Fallback to an empty array
+    }
+
+    const document = ref(parsedData);
     const setDocument = (data) => {
         document.value = data;
     };

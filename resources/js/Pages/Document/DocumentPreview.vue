@@ -305,6 +305,8 @@ const savePdf = async () => {
                 }
             });
 
+            window.location.href="/documents";
+
             if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Failed to save the file');
@@ -322,7 +324,7 @@ const savePdf = async () => {
                 }
 
             });
-            // window.location.href='/thank-you';
+            window.location.href='/thank-you';
 
             if (!response.ok) {
             const errorData = await response.json();
