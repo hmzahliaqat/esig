@@ -24,6 +24,7 @@
         "@tailwindcss/vite": "^4.0.12",
         "@tato30/vue-pdf": "^1.11.3",
         "chart.js": "^4.4.8",
+        "mitt": "^3.0.1",
         "pdf-lib": "^1.17.1",
         "pinia": "^3.0.1",
         "primeicons": "^7.0.0",

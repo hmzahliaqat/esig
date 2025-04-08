@@ -34,6 +34,7 @@ Route::post('/save-shared-pdf', [DocumentController::class , 'saveSharedPdf']);
 Route::post('/share/document', [DocumentController::class , 'share']);
 Route::delete('delete/document', [DocumentController::class , 'delete']);
 Route::post('save-fields', [DocumentController::class , 'saveFields']);
+Route::post('/reminder', [DocumentController::class , 'remindEmail']);
 
 
 

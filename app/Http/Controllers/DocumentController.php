@@ -186,6 +186,17 @@ class DocumentController extends Controller
 
 
 
+    public function remindEmail(Request $request){
+
+        $this->documentService->reminderEmail($request->id, $request->employee);
+
+        return response()->json('reminder email sent');
+
+    }
+
+
+
+
     public function getFields($documentId)
     {
         $document = Document::findOrFail($documentId);

@@ -15,14 +15,15 @@ class ShareDocumentMail extends Mailable
 
     public $id;
     public $employee_id;
-
+    public $type;
     /**
      * Create a new message instance.
      */
-    public function __construct($id, $employee_id)
+    public function __construct($id, $employee_id, $type)
     {
         $this->id = $id;
         $this->employee_id = $employee_id;
+        $this->type = $type;
     }
 
     /**
@@ -44,7 +45,8 @@ class ShareDocumentMail extends Mailable
             view: 'emails.share-document',
             with:[
                 'id' => $this->id,
-                'employee_id' => $this->employee_id
+                'employee_id' => $this->employee_id,
+                'type' => $this->type,
             ],
         );
     }

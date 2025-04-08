@@ -246,6 +246,68 @@ const getSeverity = (status) => {
     }
 };
 
+
+const downloadDocument = (data) => {
+    if (!data.pdf_path) {
+        toast.add({
+            severity: "error",
+            summary: "Download Failed",
+            detail: "PDF path is missing.",
+            life: 3000,
+        });
+        return;
+    }
+
+    // Construct the full URL to the file
+    const fileUrl = `${window.location.origin}/storage/${data.pdf_path}`;
+    console.log("Attempting to download from:", fileUrl);
+
+    fetch(fileUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = data.document?.title || "document.pdf";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            // Clean up the URL object after download is initiated
+            setTimeout(() => window.URL.revokeObjectURL(url), 100);
+        })
+        .catch(error => {
+            console.error("Download failed:", error);
+            toast.add({
+                severity: "error",
+                summary: "Download Failed",
+                detail: `Unable to download the PDF. ${error.message}`,
+                life: 3000,
+            });
+        });
+};
+
+
+const remindUser = (data) =>{
+
+    try {
+
+        axios.post('/reminder',{id:data.document.id, employee:data.employee}).then(res=>{
+            console.log(res);
+        });
+
+    } catch (error) {
+        console.error(error);
+    }
+
+
+}
+
+
 onMounted(() => {
     customers.value = trackDocumentStore.trackDocument;
     totalShared.value = trackDocumentStore.totalSharedDocuments;

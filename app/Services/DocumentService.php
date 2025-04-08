@@ -91,10 +91,19 @@ class DocumentService
             'status' => 0,
         ]);
 
-        Mail::to($employee['email'])->send(new ShareDocumentMail($documentId, $employee['id']));
+        Mail::to($employee['email'])->send(new ShareDocumentMail($documentId, $employee['id'], 'mail'));
 
         return $sharedDocument;
     }
+
+
+    public function reminderEmail(int $documentId, array $employee){
+
+        Mail::to($employee['email'])->send(new ShareDocumentMail($documentId, $employee['id'], 'reminder'));
+
+    }
+
+
 
     /**
      * Save a signed PDF document
