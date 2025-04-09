@@ -42,14 +42,6 @@ class sharedDocuments extends Model
 
 
     /**
-     * Get the signed versions of this shared document
-     */
-    public function signedDocuments()
-    {
-        return $this->hasMany(SignedDocuments::class);
-    }
-
-    /**
      * Get the share URL
      */
     public function getShareUrlAttribute(): string

@@ -212,7 +212,7 @@ const saveDocument = () => {
             document.value.id = 'DOC' + Math.floor(1000 + Math.random() * 9000);
             document.value.created_at = new Date().toISOString().slice(0, 10);
             document.value.status = document.value.status ? document.value.status.value : 'ACTIVE';
-            document.value.type = 'PDF'; // Default type
+            document.value.type = 'PDF';
             documents.value.push(document.value);
         }
 
@@ -245,9 +245,6 @@ const deleteDocument = (id) => {
         .catch((error) => {
             console.log(error);
         });
-
-
-
 };
 
 

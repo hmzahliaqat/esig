@@ -54,7 +54,18 @@ class DocumentController extends Controller
 
     public function show($id, $employeeId = null)
     {
-        $document = Document::findOrFail($id);
+        $document = null;
+
+        if($employeeId != 0){
+           $shared_document = $this->documentService->getSharedDocument($id, $employeeId);
+              if($shared_document == 404){
+                abort(404);
+              }
+
+            dd($shared_document);
+        }else{
+            $document = Document::findOrFail($id);
+        }
 
         return Inertia::render('Document/DocumentPreview', [
             'document' => $document,

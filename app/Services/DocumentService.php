@@ -78,6 +78,18 @@ class DocumentService
     }
 
 
+    public function getSharedDocument($documentId, $employeeId){
+
+      $document = sharedDocuments::with('document')->where(['document_id' => $documentId, 'employee_id'=>$employeeId])->first();
+
+      if($document->isExpired()){
+        return 404;
+      }
+
+      return $document;
+
+    }
+
 
 
 
