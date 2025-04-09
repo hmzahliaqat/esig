@@ -153,6 +153,7 @@ class DocumentController extends Controller
         }
 
         $document =  Document::find($request->id);
+        $document->delete();
         return response()->json('Document deleted', 200);
     }
 }

@@ -228,9 +228,14 @@ const confirmDeleteDocument = (doc) => {
 };
 
 const deleteDocument = (id) => {
+
+    documents.value = documents.value.filter(val => val.id !== document.value.id);
+    deleteDocumentDialog.value = false;
+    document.value = {};
+
     axios
         .delete(`/delete/document`,{
-            data:id,
+            data: { id }
         })
         .then((res) => {
             $toast.info("Document deleted!", {
@@ -242,9 +247,7 @@ const deleteDocument = (id) => {
         });
 
 
-    documents.value = documents.value.filter(val => val.id !== document.value.id);
-    deleteDocumentDialog.value = false;
-    document.value = {};
+
 };
 
 
