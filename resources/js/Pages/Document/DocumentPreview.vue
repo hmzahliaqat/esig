@@ -45,8 +45,7 @@ const downloadModifiedPdf = async () => {
                     },
                 });
 
-                window.location.href('/thank-you');
-
+                window.location.href = '/thank-you';
             }
         } catch (error) {
             console.error('Failed to upload the modified PDF:', error.response?.data || error.message);

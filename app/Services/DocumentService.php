@@ -136,6 +136,7 @@ class DocumentService
         $SharedDocument->pdf_path = $path;
         $SharedDocument->status = 1;
         $SharedDocument->signed_at= now();
+        $SharedDocument->valid_for = 0;
         $SharedDocument->save();
     }
 

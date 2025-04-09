@@ -58,11 +58,11 @@ class DocumentController extends Controller
 
         if($employeeId != 0){
            $shared_document = $this->documentService->getSharedDocument($id, $employeeId);
-              if($shared_document == 404){
+              if($shared_document === 404){
                 abort(404);
               }
 
-            dd($shared_document);
+           $document = $shared_document['document'];
         }else{
             $document = Document::findOrFail($id);
         }
