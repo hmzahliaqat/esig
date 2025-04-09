@@ -165,7 +165,7 @@ const uploadDocument = async (event) => {
         console.log(response?.data);
 
 
-        documentStore.addDocument(response?.data);
+        documents.value.push(response?.data);
 
         $toast.success('Document uploaded!', {
             position: 'top-right',
