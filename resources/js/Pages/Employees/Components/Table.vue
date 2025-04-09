@@ -167,7 +167,7 @@ import "vue-toast-notification/dist/theme-sugar.css";
 
 const dt = ref();
 const employeeStore = useEmployeeStore();
-const employees = ref([]);
+const employees = ref(employeeStore?.employee);
 const $toast = useToast();
 const employeeDialog = ref(false);
 const deleteEmployeeDialog = ref(false);
@@ -204,17 +204,17 @@ const saveEmployee = () => {
     axios
         .post("save/employee", employee.value)
         .then((res) => {
-            const isEdit = employeeStore.employee.find(emp => emp.id == res.data.id);
+            const isEdit = employees.value.find(emp => emp.id == res.data.id);
             if (isEdit) {
              const index = isEdit ? employeeStore.employee.indexOf(isEdit) : -1;
              if(index != -1){
-                employeeStore.employee[index] = res.data;
+                employees.value[index] = res.data;
                 $toast.info('Employee Updated!', {
                     position:'top-right',
                 })
              }
             } else {
-                employeeStore.addEmployee(res.data);
+                employees.value.push(res.data);
                 $toast.info('Employee Added!', {
                     position:'top-right',
                 })
@@ -239,7 +239,7 @@ const confirmDeleteEmployee = (emp) => {
 
 const deleteEmployee = (id) => {
     // Remove employee from the store
-    employeeStore.employee = employeeStore.employee.filter(emp => emp.id !== id);
+    employees.value = employees.value.filter(emp => emp.id !== id);
 
     deleteEmployeeDialog.value = false;
     employee.value = {};
@@ -349,6 +349,6 @@ const deleteSelectedEmployees = async () => {
     }
 };
 onMounted(() => {
-    employees.value = employeeStore?.employee;
+    // employees.value = employeeStore?.employee;
 });
 </script>

@@ -56,13 +56,9 @@ class DocumentController extends Controller
     {
         $document = Document::findOrFail($id);
 
-        $field = $this->getFields($id)->getData(true);
-
-
         return Inertia::render('Document/DocumentPreview', [
             'document' => $document,
             'employee_id' => $employeeId,
-            'fields'=>$field['fields'],
         ]);
     }
 
@@ -132,7 +128,7 @@ class DocumentController extends Controller
         $totalSignedDocumentCount = sharedDocuments::where('status', 1)->get()->count();
         $totalPendingDocumentCount = sharedDocuments::where('status', 0)->get()->count();
 
-        return Inertia::render('Document/TrackDocument' , [
+        return Inertia::render('Document/TrackDocument', [
             'users' => $users,
             'totalDocuments' => $totalSharedDocumentCount,
             'totalSignedDocuments' => $totalSignedDocumentCount,
@@ -140,139 +136,13 @@ class DocumentController extends Controller
         ]);
     }
 
-
-
-
-    public function saveFields(Request $request, $id , $shared = null)
+    public function remindEmail(Request $request)
     {
-
-
-        $documentId = $request->documentId;
-        $document = Document::findOrFail($documentId);
-
-        // Authorize the user can modify this document
-        // $this->authorize('update', $document);
-
-        $fields = $request->input('fields');
-
-        // First, delete any existing fields for this document
-        DocumentField::where('document_id', $documentId)->delete();
-
-        // Then save the new fields
-        $savedFields = [];
-        foreach ($fields as $field) {
-            $savedField = DocumentField::create([
-                'document_id' => $documentId,
-                'type' => $field['type'],
-                'position_x' => $field['position']['x'],
-                'position_y' => $field['position']['y'],
-                'page' => $field['page'],
-                'width' => $field['size']['width'],
-                'height' => $field['size']['height'],
-                'value' => $field['value'] ?? null, // Store the value if it exists
-                'metadata' => json_encode($field), // Store any additional data
-            ]);
-
-            $savedFields[] = $savedField;
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Document fields saved successfully',
-            'document_id' => $documentId,
-            'fields_count' => count($savedFields)
-        ]);
-    }
-
-
-
-    public function remindEmail(Request $request){
 
         $this->documentService->reminderEmail($request->id, $request->employee);
 
         return response()->json('reminder email sent');
-
     }
-
-
-
-
-    public function getFields($documentId)
-    {
-        $document = Document::findOrFail($documentId);
-
-        // Authorize the user can view this document
-        // $this->authorize('view', $document);
-
-        $documentFields = DocumentField::where('document_id', $documentId)->get();
-
-        $fields = $documentFields->map(function ($field) {
-            return [
-                'type' => $field->type,
-                'position' => [
-                    'x' => $field->position_x,
-                    'y' => $field->position_y
-                ],
-                'page' => $field->page,
-                'size' => [
-                    'width' => $field->width,
-                    'height' => $field->height
-                ],
-                'value' => $field->value,
-                // Include any additional metadata that was stored
-                'metadata' => json_decode($field->metadata)
-            ];
-        });
-
-        return response()->json([
-            'document_id' => $documentId,
-            'fields' => $fields
-        ]);
-    }
-
-
-    // public function saveSignedPdf(Request $request, $documentId)
-    // {
-    //     $document = Document::findOrFail($documentId);
-
-    //     // Authorize the user can modify this document
-    //     $this->authorize('update', $document);
-
-    //     // Validate the request
-    //     $request->validate([
-    //         'signed_pdf' => 'required|file|mimes:pdf'
-    //     ]);
-
-    //     // Get the file
-    //     $signedPdf = $request->file('signed_pdf');
-
-    //     // Generate a unique filename
-    //     $filename = 'signed_' . uniqid() . '.pdf';
-
-    //     // Store the file
-    //     $path = $signedPdf->storeAs('signed_documents', $filename, 'public');
-
-    //     // Update the document record
-    //     $document->signed_pdf_path = $path;
-    //     $document->status = 'signed';
-    //     $document->save();
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Signed document saved successfully',
-    //         'document_id' => $documentId,
-    //         'signed_pdf_path' => $path
-    //     ]);
-    // }
-
-
-
-
-
-
-
-
-
 
 
     public function delete(Request $request)
