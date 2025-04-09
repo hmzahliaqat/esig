@@ -308,5 +308,15 @@ const deleteSelectedDocuments = async() => {
 
 onMounted(() => {
     documents.value = documentStore?.document;
+
+    const success = sessionStorage.getItem('pdfSavedSuccess');
+    const message = sessionStorage.getItem('pdfSavedMessage') || 'PDF successfully uploaded';
+
+  if(success === 'true') {
+    $toast.success(message);
+    sessionStorage.removeItem('pdfSavedSuccess');
+    sessionStorage.removeItem('pdfSavedMessage');
+  }
+
 });
 </script>

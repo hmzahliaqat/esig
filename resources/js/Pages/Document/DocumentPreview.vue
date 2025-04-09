@@ -26,27 +26,26 @@ const downloadModifiedPdf = async () => {
             formData.append('file', blob, props.document.pdf_path.split('/').pop()); // Add the file
             formData.append('filepath', props.document.pdf_path); // Add the filepath
 
-            if(props.employee_id == 0){
-            const response = await axios.post('/replace-pdf', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            if (props.employee_id == 0) {
+                const response = await axios.post('/replace-pdf', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
 
-            console.log(response.data.message); // Log success message
-            alert('File uploaded successfully!');
-        }else{
-            formData.append('employee_id', props?.employee_id);
-            formData.append('document_id', props?.document?.id);
-            const response = await axios.post('/save-shared-pdf', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+                sessionStorage.setItem('pdfSavedSuccess', 'true');
+                sessionStorage.setItem('pdfSavedMessage', 'PDF successfully updated');
+                window.location.href = '/documents';
+            } else {
+                formData.append('employee_id', props?.employee_id);
+                formData.append('document_id', props?.document?.id);
+                const response = await axios.post('/save-shared-pdf', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
 
-            console.log(response.data.message); // Log success message
-            alert('File uploaded successfully!');
-        }
+            }
         } catch (error) {
             console.error('Failed to upload the modified PDF:', error.response?.data || error.message);
             alert('Failed to upload the file. Please try again.');
@@ -77,16 +76,20 @@ const downloadModifiedPdf = async () => {
 }
 
 .download-btn {
-    position: fixed; /* Change to fixed to float relative to the viewport */
-    bottom: 10px; /* Position at the bottom */
-    right: 10px; /* Position at the right */
+    position: fixed;
+    /* Change to fixed to float relative to the viewport */
+    bottom: 10px;
+    /* Position at the bottom */
+    right: 10px;
+    /* Position at the right */
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    z-index: 1000; /* Ensure it stays above other elements */
+    z-index: 1000;
+    /* Ensure it stays above other elements */
 }
 
 .download-btn:hover {
