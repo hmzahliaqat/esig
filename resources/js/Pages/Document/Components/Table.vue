@@ -165,7 +165,7 @@ const uploadDocument = async (event) => {
         console.log(response?.data);
 
 
-        documentStore.addDocument(response?.data);
+        documents.value.push(response?.data);
 
         $toast.success('Document uploaded!', {
             position: 'top-right',
@@ -212,7 +212,7 @@ const saveDocument = () => {
             document.value.id = 'DOC' + Math.floor(1000 + Math.random() * 9000);
             document.value.created_at = new Date().toISOString().slice(0, 10);
             document.value.status = document.value.status ? document.value.status.value : 'ACTIVE';
-            document.value.type = 'PDF'; // Default type
+            document.value.type = 'PDF';
             documents.value.push(document.value);
         }
 
@@ -228,9 +228,14 @@ const confirmDeleteDocument = (doc) => {
 };
 
 const deleteDocument = (id) => {
+
+    documents.value = documents.value.filter(val => val.id !== document.value.id);
+    deleteDocumentDialog.value = false;
+    document.value = {};
+
     axios
         .delete(`/delete/document`,{
-            data:id,
+            data: { id }
         })
         .then((res) => {
             $toast.info("Document deleted!", {
@@ -240,11 +245,6 @@ const deleteDocument = (id) => {
         .catch((error) => {
             console.log(error);
         });
-
-
-    documents.value = documents.value.filter(val => val.id !== document.value.id);
-    deleteDocumentDialog.value = false;
-    document.value = {};
 };
 
 
@@ -305,5 +305,15 @@ const deleteSelectedDocuments = async() => {
 
 onMounted(() => {
     documents.value = documentStore?.document;
+
+    const success = sessionStorage.getItem('pdfSavedSuccess');
+    const message = sessionStorage.getItem('pdfSavedMessage') || 'PDF successfully uploaded';
+
+  if(success === 'true') {
+    $toast.success(message);
+    sessionStorage.removeItem('pdfSavedSuccess');
+    sessionStorage.removeItem('pdfSavedMessage');
+  }
+
 });
 </script>

@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ReplacePdfRequest;
 use App\Http\Requests\ShareDocumentRequest;
 use App\Http\Requests\UploadDocumentRequest;
+use App\Models\DocumentField;
 use App\Models\sharedDocuments;
 use App\Services\DocumentService;
 use Carbon\Carbon;
@@ -53,12 +54,22 @@ class DocumentController extends Controller
 
     public function show($id, $employeeId = null)
     {
-        $document = Document::findOrFail($id);
+        $document = null;
 
+        if($employeeId != 0){
+           $shared_document = $this->documentService->getSharedDocument($id, $employeeId);
+              if($shared_document === 404){
+                abort(404);
+              }
+
+           $document = $shared_document['document'];
+        }else{
+            $document = Document::findOrFail($id);
+        }
 
         return Inertia::render('Document/DocumentPreview', [
             'document' => $document,
-            'employee_id' => $employeeId
+            'employee_id' => $employeeId,
         ]);
     }
 
@@ -128,12 +139,20 @@ class DocumentController extends Controller
         $totalSignedDocumentCount = sharedDocuments::where('status', 1)->get()->count();
         $totalPendingDocumentCount = sharedDocuments::where('status', 0)->get()->count();
 
-        return Inertia::render('Document/TrackDocument' , [
+        return Inertia::render('Document/TrackDocument', [
             'users' => $users,
             'totalDocuments' => $totalSharedDocumentCount,
             'totalSignedDocuments' => $totalSignedDocumentCount,
             'totalPendingDocuments' => $totalPendingDocumentCount,
         ]);
+    }
+
+    public function remindEmail(Request $request)
+    {
+
+        $this->documentService->reminderEmail($request->id, $request->employee);
+
+        return response()->json('reminder email sent');
     }
 
 
@@ -145,6 +164,7 @@ class DocumentController extends Controller
         }
 
         $document =  Document::find($request->id);
+        $document->delete();
         return response()->json('Document deleted', 200);
     }
 }
