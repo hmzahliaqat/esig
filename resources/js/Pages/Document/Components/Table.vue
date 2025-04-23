@@ -46,7 +46,7 @@
 
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
-                        <Button icon="pi pi-eye" class="mr-2" outlined rounded severity="info"
+                        <Button icon="pi pi-pen-to-square" class="mr-2" outlined rounded severity="info"
                         @click="editDocument(slotProps.data.id)" />
                         <Button icon="pi pi-eye" class="mr-2" outlined rounded severity="info"
                             @click="viewDocument(slotProps.data.id)" />
