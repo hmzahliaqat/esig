@@ -140,19 +140,6 @@ class DocumentService
         $SharedDocument->save();
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * Convert Word document to PDF
      */

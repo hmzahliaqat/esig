@@ -67,6 +67,27 @@ class DocumentController extends Controller
             $document = Document::findOrFail($id);
         }
 
+        return Inertia::render('Document/DocumentEdit', [
+            'document' => $document,
+            'employee_id' => $employeeId,
+        ]);
+    }
+
+    public function edit($id, $employeeId = null)
+    {
+        $document = null;
+
+        if($employeeId != 0){
+           $shared_document = $this->documentService->getSharedDocument($id, $employeeId);
+              if($shared_document === 404){
+                abort(404);
+              }
+
+           $document = $shared_document['document'];
+        }else{
+            $document = Document::findOrFail($id);
+        }
+
         return Inertia::render('Document/DocumentPreview', [
             'document' => $document,
             'employee_id' => $employeeId,

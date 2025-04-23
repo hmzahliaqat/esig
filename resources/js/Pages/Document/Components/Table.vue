@@ -47,6 +47,8 @@
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
                         <Button icon="pi pi-eye" class="mr-2" outlined rounded severity="info"
+                        @click="editDocument(slotProps.data.id)" />
+                        <Button icon="pi pi-eye" class="mr-2" outlined rounded severity="info"
                             @click="viewDocument(slotProps.data.id)" />
                         <Button icon="pi pi-trash" outlined rounded severity="danger"
                             @click="confirmDeleteDocument(slotProps.data)" />
@@ -187,6 +189,11 @@ const uploadDocument = async (event) => {
 const viewDocument = (id) => {
     window.location.href = `/document/${id}/0/preview`;
 }
+
+const editDocument = (id) => {
+    window.location.href = `/document/${id}/0/edit`;
+}
+
 
 const shareDocument = (id) =>{
 
