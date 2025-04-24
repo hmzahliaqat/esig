@@ -67,7 +67,7 @@ class DocumentController extends Controller
             $document = Document::findOrFail($id);
         }
 
-        return Inertia::render('Document/DocumentEdit', [
+        return Inertia::render('Document/DocumentPreview', [
             'document' => $document,
             'employee_id' => $employeeId,
         ]);
@@ -88,7 +88,7 @@ class DocumentController extends Controller
             $document = Document::findOrFail($id);
         }
 
-        return Inertia::render('Document/DocumentPreview', [
+        return Inertia::render('Document/DocumentEdit', [
             'document' => $document,
             'employee_id' => $employeeId,
         ]);

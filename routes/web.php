@@ -38,7 +38,7 @@ Route::post('/employees/import', [EmployeesController::class, 'import'])->name('
 
 Route::post('save/document', [DocumentController::class , 'upload']);
 Route::get('document/{id}/{shared}/preview', [DocumentController::class , 'show']);
-Route::get('document/{id}/{shared}/edit', [DocumentController::class , 'show']);
+Route::get('document/{id}/{shared}/edit', [DocumentController::class , 'edit']);
 
 Route::post('/replace-pdf', [DocumentController::class , 'replacePdf']);
 Route::post('/save-shared-pdf', [DocumentController::class , 'saveSharedPdf']);
