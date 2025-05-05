@@ -15,9 +15,16 @@ use App\Models\sharedDocuments;
 use App\Services\DocumentService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-
+use App\Traits\LogsDocumentActions;
 class DocumentController extends Controller
 {
+    use LogsDocumentActions;
+
+
+    /**
+     * @var DocumentService
+     */
+
     protected $documentService;
 
     public function __construct(DocumentService $documentService)
@@ -45,6 +52,7 @@ class DocumentController extends Controller
                 Auth::id()
             );
 
+            $log = $this->logDocumentAction(Auth::id() , $document['id'], null ,'uploaded' );
             return response()->json($document, 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -117,6 +125,7 @@ class DocumentController extends Controller
             }
 
             $this->documentService->shareWithEmployee($request->id, $request->employee);
+            $log = $this->logDocumentAction(Auth::id() , $document['id'], $request->employee['id'] ,'shared' );
 
             return response()->json(['message' => 'Email sent successfully'], 200);
         } catch (\Exception $e) {
@@ -143,6 +152,7 @@ class DocumentController extends Controller
                 $request->document_id,
                 $request->employee_id,
             );
+            $log = $this->logDocumentAction(Auth::id() , $request->document_id, $request->employee_id,'signed' );
 
             return response()->json(['message' => 'Document saved successfully', 'document' => $signedDocument]);
         } catch (\Exception $e) {

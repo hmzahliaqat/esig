@@ -8,7 +8,23 @@ const props = defineProps([
   "completed_signatures",
   "documents_shared",
   "recent_documents",
+  "logs",
 ]);
+
+const getLogsMessages = (action, user) => {
+  switch (action) {
+    case "uploaded":
+      return `${user} uploaded `;
+    case "shared":
+      return `${user} shared`;
+    case "signed":
+      return `${user} signed `;
+    case "downloaded":
+      return `${user} downloaded`;
+    default:
+      return "";
+  }
+};
 </script>
 
 <template>
@@ -258,7 +274,7 @@ const props = defineProps([
           </div>
           <div class="p-6">
             <div class="space-y-4">
-              <div class="flex items-start">
+              <div v-for="log in props?.logs" class="flex items-start">
                 <div class="flex-shrink-0">
                   <div
                     class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-medium"
@@ -268,75 +284,10 @@ const props = defineProps([
                 </div>
                 <div class="ml-3">
                   <p class="text-sm font-medium text-gray-800">
-                    John Doe signed
-                    <span class="font-semibold">Project Contract</span>
+                    {{ getLogsMessages(log?.action, log?.user?.name) }}
+                    <span class="font-semibold">{{ log?.document?.title }}</span>
                   </p>
-                  <p class="text-xs text-gray-500">Today, 11:23 AM</p>
-                </div>
-              </div>
-              <div class="flex items-start">
-                <div class="flex-shrink-0">
-                  <div
-                    class="w-8 h-8 rounded-full bg-pink-500 flex items-center justify-center text-white font-medium"
-                  >
-                    AL
-                  </div>
-                </div>
-                <div class="ml-3">
-                  <p class="text-sm font-medium text-gray-800">
-                    Amy Lee requested signature on
-                    <span class="font-semibold">NDA Document</span>
-                  </p>
-                  <p class="text-xs text-gray-500">Today, 9:45 AM</p>
-                </div>
-              </div>
-              <div class="flex items-start">
-                <div class="flex-shrink-0">
-                  <div
-                    class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white font-medium"
-                  >
-                    RJ
-                  </div>
-                </div>
-                <div class="ml-3">
-                  <p class="text-sm font-medium text-gray-800">
-                    Robert Johnson completed
-                    <span class="font-semibold">Annual Review</span>
-                  </p>
-                  <p class="text-xs text-gray-500">Yesterday, 3:30 PM</p>
-                </div>
-              </div>
-              <div class="flex items-start">
-                <div class="flex-shrink-0">
-                  <div
-                    class="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-white font-medium"
-                  >
-                    SK
-                  </div>
-                </div>
-                <div class="ml-3">
-                  <p class="text-sm font-medium text-gray-800">
-                    Sarah Kim shared
-                    <span class="font-semibold">Q1 Report</span>
-                    with 5 employees
-                  </p>
-                  <p class="text-xs text-gray-500">Yesterday, 2:15 PM</p>
-                </div>
-              </div>
-              <div class="flex items-start">
-                <div class="flex-shrink-0">
-                  <div
-                    class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium"
-                  >
-                    MP
-                  </div>
-                </div>
-                <div class="ml-3">
-                  <p class="text-sm font-medium text-gray-800">
-                    Mike Peters declined
-                    <span class="font-semibold">Contractor Agreement</span>
-                  </p>
-                  <p class="text-xs text-gray-500">Mar 18, 2025</p>
+                  <p class="text-xs text-gray-500">{{ log?.created_at }}</p>
                 </div>
               </div>
             </div>

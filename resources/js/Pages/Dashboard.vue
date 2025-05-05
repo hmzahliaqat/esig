@@ -8,6 +8,7 @@ const props = defineProps([
   "completed_signatures",
   "documents_shared",
   "recent_documents",
+  "logs",
 ]);
 </script>
 
@@ -27,6 +28,7 @@ const props = defineProps([
             :completed_signatures="props?.completed_signatures"
             :documents_shared="props?.documents_shared"
             :recent_documents="props?.recent_documents"
+            :logs="props?.logs"
           />
         </div>
       </div>

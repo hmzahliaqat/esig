@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\Employee;
+use App\Models\Log;
 use App\Models\sharedDocuments;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +29,7 @@ class DashboardController extends Controller
             ->take(4)
             ->get();
 
+        $logs = Log::with('user', 'document', 'employee')->where('user_id', Auth::id())->orderBy('created_at', 'desc')->get();
         return Inertia::render('Dashboard', [
             'total_documents' => $total_documents,
             'total_employees' => $total_employees,
@@ -35,6 +37,11 @@ class DashboardController extends Controller
             'completed_signatures' => $completed_signatures,
             'documents_shared' => $documents_shared,
             'recent_documents' => $recent_documents,
+            'logs' => $logs,
         ]);
     }
+
+
+
+
 }

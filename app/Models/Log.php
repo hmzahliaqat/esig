@@ -27,4 +27,10 @@ class Log extends Model
     {
         return $this->belongsTo(Employee::class);
     }
+
+    public function getCreatedAtAttribute($value)
+    {
+        return \Carbon\Carbon::parse($value)->diffForHumans();
+    }
+
 }
