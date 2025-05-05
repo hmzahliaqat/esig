@@ -27,7 +27,4 @@ class Log extends Model
     {
         return $this->belongsTo(Employee::class);
     }
-
-
-
 }
