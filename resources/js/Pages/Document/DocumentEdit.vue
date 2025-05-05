@@ -85,7 +85,7 @@ const tools = [
   { type: "initials", label: "Initials" },
   { type: "date", label: "Date" },
 ];
-const currentTool = ref("signature");
+const currentTool = ref("");
 
 // Tool dimensions
 const toolDimensions = {
@@ -191,6 +191,11 @@ async function renderPages() {
 
 // Select a tool
 function selectTool(toolType) {
+  if (currentTool.value === toolType) {
+    currentTool.value = "";
+    return;
+  }
+
   currentTool.value = toolType;
 }
 

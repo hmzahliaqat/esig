@@ -34,6 +34,8 @@ import Drawer from "primevue/drawer";
 import Button from "primevue/button";
 import { useEmployeeStore } from "@/Store/EmployeeStore";
 import { useDocumentStore } from "@/Store/DocumentStore";
+import { useToast } from "vue-toast-notification";
+import "vue-toast-notification/dist/theme-sugar.css";
 const props = defineProps({
   visible: {
     type: Boolean,
@@ -47,6 +49,7 @@ const props = defineProps({
 const employeeStore = useEmployeeStore();
 const documentStore = useDocumentStore();
 const visibleRight = ref(props.visible);
+const $toast = useToast();
 
 // Watch for changes in the visible prop to update the drawer visibility
 watch(
@@ -60,21 +63,32 @@ const employees = employeeStore.employee;
 
 // Function to share the document with a specific user
 const shareUser = (user) => {
-  console.log(`Sharing document with ${user.name}`);
-  const documet = documentStore.document.find(doc=> doc.id == props.id);
- axios.post("/share/document", {
-    id: props.id,
-    employee: user,
-    access_hash:documet?.access_hash,
-    _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-  })
-  .then((res) => console.log(res))
-  .catch((error) => console.error("Error sharing document:", error));
+  const documet = documentStore.document.find((doc) => doc.id == props.id);
+  axios
+    .post("/share/document", {
+      id: props.id,
+      employee: user,
+      access_hash: documet?.access_hash,
+      _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+    })
+    .then((res) => {
+      visibleRight.value = false;
+
+      $toast.success(res?.data?.message, {
+        position: "top-right",
+      });
+    })
+    .catch((error) => {
+      visibleRight.value = false;
+
+      $toast.error(error?.response?.data?.message, {
+        position: "top-right",
+      });
+    });
 };
 
 // Function to share the document with all users
 const shareAll = () => {
   console.log("Sharing document with all users");
-  // Insert your share-all logic here
 };
 </script>

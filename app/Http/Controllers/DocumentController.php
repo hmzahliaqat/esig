@@ -113,7 +113,7 @@ class DocumentController extends Controller
                 ->first();
 
             if ($alreadyShared) {
-                return response()->json('Document Already Shared');
+                return response()->json(['message' => 'Document Already Shared'], 500);
             }
 
             $this->documentService->shareWithEmployee($request->id, $request->employee);
