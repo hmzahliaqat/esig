@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use League\Csv\Reader;
@@ -27,17 +28,16 @@ class EmployeesController extends Controller
     public function save(EmployeeRequest $request)
     {
 
-        if($request->has('id')){
-         $employee = Employee::find($request->id);
+        if ($request->has('id')) {
+            $employee = Employee::find($request->id);
 
-         if($employee){
-            $employee->name = $request->name;
-            $employee->email = $request->email;
-            $employee->save();
-         }
-         return response()->json($employee, 200);
-
-        }else{
+            if ($employee) {
+                $employee->name = $request->name;
+                $employee->email = $request->email;
+                $employee->save();
+            }
+            return response()->json($employee, 200);
+        } else {
             $employee = Employee::create([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -45,17 +45,14 @@ class EmployeesController extends Controller
             ]);
             return response()->json($employee, 200);
         }
-
-
-
     }
 
 
-    public function delete(Request $request, $id=null)
+    public function delete(Request $request, $id = null)
     {
-        if($request->has('ids')){
+        if ($request->has('ids')) {
             Employee::whereIn('id', $request->ids)->delete();
-            return response()->json('Employees deleted',200);
+            return response()->json('Employees deleted', 200);
         }
 
         $employee = Employee::findOrFail($id);
@@ -64,8 +61,6 @@ class EmployeesController extends Controller
         }
 
         return response()->json($employee, 200);
-
-
     }
 
 
@@ -82,7 +77,7 @@ class EmployeesController extends Controller
         $employees = [];
 
         foreach ($records as $record) {
-            \Log::info('Processing Record:', $record); // Log records for debugging
+            Log::info('Processing Record:', $record); //Log records for debugging
 
             // Validate each row
             $employees = [];
@@ -94,7 +89,7 @@ class EmployeesController extends Controller
                 ]);
 
                 if ($validator->fails()) {
-                    \Log::warning('Validation Failed:', $validator->errors()->toArray()); // Log validation errors
+                    Log::warning('Validation Failed:', $validator->errors()->toArray()); //Log validation errors
                     continue; // Skip invalid records
                 }
 
@@ -110,15 +105,12 @@ class EmployeesController extends Controller
             }
 
             if (!empty($employees)) {
-                \Log::info('Employees inserted successfully:', $employees);
+                Log::info('Employees inserted successfully:', $employees);
             } else {
-                \Log::warning('No valid employees to insert.');
+                Log::warning('No valid employees to insert.');
             }
 
             return response()->json(['message' => 'CSV imported successfully', 'data' => $employees], 200);
         }
-
-
-
     }
 }

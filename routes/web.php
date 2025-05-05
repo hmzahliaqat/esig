@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EmployeesController;
 use Illuminate\Foundation\Application;
@@ -67,9 +68,7 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index' ])->name('dashboard');
 
     Route::get('/employees' , [EmployeesController::class, 'index'])->name('employees');
     Route::get('/documents' , [DocumentController::class, 'index'])->name('documents');
