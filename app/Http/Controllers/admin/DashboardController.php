@@ -17,7 +17,6 @@ class DashboardController extends Controller
 
     public function index()
     {
-
         $total_documents = Document::where('user_id', Auth::id())->count();
         $total_employees = Employee::where('user_id', Auth::id())->count();
         $pending_signatures = sharedDocuments::where(['user_id' => Auth::id(), 'status' => 0])->count();
@@ -40,6 +39,9 @@ class DashboardController extends Controller
             'logs' => $logs,
         ]);
     }
+
+
+
 
 
 

@@ -21,5 +21,6 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call(companyAndEmployeeSeeder::class);
         $this->call(RolesSeeder::class);
+        $this->call(SuperAdminSeeder::class);
     }
 }

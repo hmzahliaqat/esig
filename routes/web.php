@@ -3,6 +3,7 @@
 use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EmployeesController;
+use App\Http\Controllers\superAdmin\SuperAdminController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -62,14 +63,13 @@ Route::get('/documents/view/{filename}', function ($filename) {
 
 
 
-
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index' ])->name('dashboard');
-
+    Route::get('/superadmin/dashboard', [SuperAdminController::class , 'index'])->name('superadmin.dashboard');
     Route::get('/employees' , [EmployeesController::class, 'index'])->name('employees');
     Route::get('/documents' , [DocumentController::class, 'index'])->name('documents');
     Route::get('/track/documents' , [DocumentController::class, 'track'])->name('track.documents');
