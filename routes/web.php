@@ -69,10 +69,12 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index' ])->name('dashboard');
-    Route::get('/superadmin/dashboard', [SuperAdminController::class , 'index'])->name('superadmin.dashboard');
     Route::get('/employees' , [EmployeesController::class, 'index'])->name('employees');
     Route::get('/documents' , [DocumentController::class, 'index'])->name('documents');
     Route::get('/track/documents' , [DocumentController::class, 'track'])->name('track.documents');
+
+    Route::get('/superadmin/dashboard', [SuperAdminController::class , 'index'])->name('superadmin.dashboard');
+    Route::get('/superadmin/companies', [SuperAdminController::class , 'getCompanies'])->name('superadmin.companies');
 
 
 });

@@ -72,6 +72,10 @@ class User extends Authenticatable
         return $this->hasMany(Employee::class);
     }
 
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
 
 
     public function sharedDocuments()
