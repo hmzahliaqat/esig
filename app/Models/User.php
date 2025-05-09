@@ -84,6 +84,12 @@ class User extends Authenticatable
     }
 
 
+    public function getCreatedAtAttribute($attribute)
+    {
+        return \Carbon\Carbon::parse($attribute)->diffForHumans();
+    }
+
+
 
 
 }
